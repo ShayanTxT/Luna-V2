@@ -17,8 +17,7 @@ def test_flood_cleanup():
     from utils import filters
     filters._last_cleanup = 0
     _cleanup_old_entries()
-    assert (999,1) not in filters.user_messages or len(filters.user_messages[(999,1)]) == 0 or True
-
+    assert (999, 1) not in filters.user_messages
 def test_anti_forward_fixed():
     src = Path("handlers/moderation.py").read_text()
     assert "forward_origin" in src, "Should use forward_origin not forward_date"

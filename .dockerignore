@@ -1,0 +1,9 @@
+__pycache__
+*.pyc
+.git
+.venv
+logs
+database/backups
+database/*.db
+.env
+luna-v2.zip

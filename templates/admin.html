@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل لونا - مدیریت گروه</title>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:Vazirmatn, Tahoma, sans-serif}
+body{margin:0;background:#0f111a;color:#e8e8e8;min-height:100vh}
+.header{background:linear-gradient(135deg,#6a11cb 0%,#2575fc 100%);padding:22px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.header h1{margin:0;font-size:26px;letter-spacing:-.5px}
+.header p{margin:6px 0 0;opacity:.9;font-size:14px}
+.container{max-width:1150px;margin:22px auto;padding:0 14px;display:grid;grid-template-columns:295px 1fr;gap:18px}
+@media(max-width:850px){.container{grid-template-columns:1fr}}
+.card{background:#1a1d2e;border:1px solid #2a2f4a;border-radius:16px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.group-item{padding:11px 12px;border-radius:10px;background:#16213e;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:.15s}
+.group-item:hover{background:#1e3a5f;transform:translateY(-1px)}
+.group-item.active{background:#2575fc;color:#fff}
+a{color:#7ab8ff;text-decoration:none}
+label{display:block;margin:12px 0 6px;font-size:13.5px;color:#b8b8c0}
+input[type=text],input[type=number],textarea,select{width:100%;padding:10px 11px;border-radius:9px;border:1px solid #33364a;background:#0f111a;color:#fff;outline:none}
+input:focus,textarea:focus,select:focus{border-color:#6a11cb}
+textarea{min-height:85px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.switch{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:14px}
+.switch input{width:auto;accent-color:#6a11cb}
+.btn{background:linear-gradient(135deg,#6a11cb,#2575fc);border:none;color:#fff;padding:11px 18px;border-radius:10px;cursor:pointer;font-weight:700;width:100%;margin-top:14px;font-size:15px}
+.btn:hover{opacity:.92}
+.btn-sm{padding:7px 12px;font-size:13px;width:auto;margin-top:6px}
+.btn-danger{background:linear-gradient(135deg,#ff416c,#ff4b2b)}
+.btn-ghost{background:#2a2f4a}
+.badge{padding:4px 8px;border-radius:6px;font-size:11px;background:#2a2a4a}
+.ok{background:#0a3d2e;color:#86efac;padding:10px;border-radius:8px;margin-bottom:12px;text-align:center;border:1px solid #14532d}
+.tabs{display:flex;gap:8px;margin:14px 0;overflow-x:auto}
+.tab{padding:8px 14px;border-radius:20px;background:#0f111a;border:1px solid #2a2f4a;cursor:pointer;white-space:nowrap;font-size:13px}
+.tab.active{background:#6a11cb;border-color:#6a11cb;color:#fff}
+.section{border-top:1px dashed #2a2f4a;margin-top:16px;padding-top:14px}
+.api-card{background:#0f111a;border:1px solid #2a2f4a;border-radius:10px;padding:12px;margin-bottom:10px}
+.api-card.disabled{opacity:.55}
+code{font-family:Consolas, monospace;background:#0f111a;padding:2px 6px;border-radius:4px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🌙 لونا - پنل مدیریت</h1>
+<p>نسخه 2.1 - ساخته شده برای رفیق‌ها | هر سوالی داری به ادمین بگو</p>
+</div>
+
+<div class="container">
+<!-- ستون راست: لیست گروه ها -->
+<div class="card">
+<h3 style="margin-top:0">📋 گروه‌ها</h3>
+{% if groups %}
+{% for g in groups %}
+<a href="/admin?chat_id={{ g.chat_id }}">
+<div class="group-item {% if selected and selected.chat_id==g.chat_id %}active{% endif %}">
+<span>{{ g.title or g.chat_id }}</span><span class="badge">{{ g.chat_id }}</span>
+</div>
+</a>
+{% endfor %}
+{% else %}
+<p style="color:#888;font-size:13px">هنوز گروهی ثبت نشده. ربات رو به گروه اضافه کن و یه پیام بده تا اینجا بیاد.</p>
+{% endif %}
+
+<!-- بخش API Pool - جدید! -->
+<div class="section">
+<h3 style="font-size:16px">🔑 API Pool <span style="font-size:11px;color:#888">(رایگان)</span></h3>
+<p style="font-size:12px;color:#aaa">هر کلید رایگان داری اینجا اضافه کن. لونا خودش به ترتیب تست میکنه تا یکیش جواب بده.</p>
+
+<!-- لیست API ها -->
+{% for api in apis %}
+<div class="api-card {% if not api.enabled %}disabled{% endif %}">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<b>{{ api.name }}</b>
+<span class="badge">{{ api.model }}</span>
+</div>
+<div style="font-size:12px;color:#888;margin:6px 0;word-break:break-all">
+<code>{{ api.base_url }}</code> - اولویت: {{ api.priority }} - {% if api.enabled %}✅ فعال{% else %}⛔ خاموش{% endif %}
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<form method="post" action="/admin/api/toggle" style="display:inline">
+<input type="hidden" name="api_id" value="{{ api.id }}">
+<input type="hidden" name="enabled" value="{{ api.enabled }}">
+<button class="btn btn-ghost btn-sm" type="submit">{% if api.enabled %}خاموش کن{% else %}روشن کن{% endif %}</button>
+</form>
+<form method="post" action="/admin/api/delete" style="display:inline" onsubmit="return confirm('پاک کنم؟')">
+<input type="hidden" name="api_id" value="{{ api.id }}">
+<button class="btn btn-danger btn-sm" type="submit">حذف</button>
+</form>
+</div>
+<!-- فرم ویرایش سریع -->
+<details style="margin-top:8px">
+<summary style="font-size:12px;cursor:pointer;color:#7ab8ff">ویرایش</summary>
+<form method="post" action="/admin/api/edit" style="margin-top:8px">
+<input type="hidden" name="api_id" value="{{ api.id }}">
+<label>نام</label><input type="text" name="name" value="{{ api.name }}" required>
+<label>Base URL</label><input type="text" name="base_url" value="{{ api.base_url }}" required>
+<label>API Key</label><input type="text" name="api_key" value="{{ api.api_key }}" required>
+<label>Model</label><input type="text" name="model" value="{{ api.model }}" required>
+<label>اولویت (کوچکتر اول)</label><input type="number" name="priority" value="{{ api.priority }}">
+<button class="btn btn-sm" type="submit">ذخیره</button>
+</form>
+</details>
+</div>
+{% endfor %}
+{% if not apis %}
+<p style="font-size:12px;color:#f87171">هنوز API اضافه نکردی! از فرم زیر شروع کن.</p>
+{% endif %}
+
+<!-- فرم افزودن -->
+<details {% if not apis %}open{% endif %} style="margin-top:10px;background:#1a1d2e;padding:10px;border-radius:10px">
+<summary style="cursor:pointer;font-weight:bold">➕ افزودن API جدید</summary>
+<form method="post" action="/admin/api/add" style="margin-top:10px">
+<label>نام (مثلا groq / openrouter)</label>
+<input type="text" name="name" placeholder="groq" required>
+<label>Base URL</label>
+<input type="text" name="base_url" placeholder="https://api.groq.com/openai/v1" required>
+<label>API Key</label>
+<input type="text" name="api_key" placeholder="gsk_..." required>
+<label>Model</label>
+<input type="text" name="model" placeholder="llama-3.1-70b-versatile" required>
+<label>اولویت</label>
+<input type="number" name="priority" value="0">
+<button class="btn btn-sm" type="submit">افزودن</button>
+<p style="font-size:11px;color:#888;margin-top:8px">
+💡 کجا کلید رایگان بگیرم؟<br>
+• Groq: console.groq.com/keys<br>
+• OpenRouter: openrouter.ai/keys<br>
+• OpenAI: platform.openai.com
+</p>
+</form>
+</details>
+
+{% if request.query_params.get('api_added') %}<div class="ok" style="margin-top:10px">✅ API اضافه شد</div>{% endif %}
+{% if request.query_params.get('api_deleted') %}<div class="ok" style="margin-top:10px">🗑️ حذف شد</div>{% endif %}
+{% if request.query_params.get('api_edited') %}<div class="ok" style="margin-top:10px">✏️ ویرایش شد</div>{% endif %}
+</div>
+</div>
+
+<!-- ستون چپ: تنظیمات گروه -->
+<div class="card">
+{% if request.query_params.get('saved') %}
+<div class="ok">✅ تنظیمات ذخیره شد - دمت گرم!</div>
+{% endif %}
+
+{% if selected %}
+<h3 style="margin-top:0">⚙️ {{ selected.title }} - تنظیمات</h3>
+<p style="font-size:12px;color:#888">ID: <code>{{ selected.chat_id }}</code></p>
+<form method="post" action="/admin/save">
+<input type="hidden" name="chat_id" value="{{ selected.chat_id }}">
+
+<label>💬 متن خوش‌آمدگویی</label>
+<textarea name="welcome_text" placeholder="سلام {name} به {title} خوش اومدی!">{{ selected.welcome_text }}</textarea>
+<p style="font-size:11px;color:#888">می‌تونی از {name} و {title} و {username} استفاده کنی</p>
+<div class="switch"><input type="checkbox" name="welcome_enabled" value="1" {% if selected.welcome_enabled %}checked{% endif %}> خوش‌آمد فعال باشه</div>
+
+<label>🎭 شخصیت لونا</label>
+<select name="personality">
+<option value="shookh" {% if selected.personality=='shookh' %}selected{% endif %}>😜 شوخ تهرانی - بامزه و تیکه‌انداز</option>
+<option value="naz" {% if selected.personality=='naz' %}selected{% endif %}>💖 ناز لوس - کیوت و مهربون</option>
+<option value="lati" {% if selected.personality=='lati' %}selected{% endif %}>😎 لات با مرام - رفیق مشتی</option>
+<option value="rok" {% if selected.personality=='rok' %}selected{% endif %}>🔥 رُک 18+ - بی‌پرده</option>
+</select>
+
+<div class="row">
+<div>
+<label>🛡️ سطح سخت‌گیری</label>
+<select name="strictness">
+<option value="1" {% if selected.strictness==1 %}selected{% endif %}>1 - مهربون</option>
+<option value="2" {% if selected.strictness==2 %}selected{% endif %}>2 - متوسط</option>
+<option value="3" {% if selected.strictness==3 %}selected{% endif %}>3 - سخت‌گیر</option>
+</select>
+</div>
+<div>
+<label>⚠️ سقف اخطار</label>
+<input type="number" name="warn_limit" value="{{ selected.warn_limit }}" min="1" max="10">
+</div>
+</div>
+
+<label>⏱️ مدت میوت (ثانیه)</label>
+<input type="number" name="mute_duration" value="{{ selected.mute_duration }}">
+
+<h4 style="margin:18px 0 8px">🚦 فیلترها</h4>
+<div class="switch"><input type="checkbox" name="anti_link" value="1" {% if selected.anti_link %}checked{% endif %}> 🔗 ضد لینک (تلگرام/اینستا)</div>
+<div class="switch"><input type="checkbox" name="anti_forward" value="1" {% if selected.anti_forward %}checked{% endif %}> ↪️ ضد فوروارد</div>
+<div class="switch"><input type="checkbox" name="anti_sticker" value="1" {% if selected.anti_sticker %}checked{% endif %}> 🎟️ ضد استیکر/گیف</div>
+<div class="switch"><input type="checkbox" name="anti_spam" value="1" {% if selected.anti_spam %}checked{% endif %}> 🤖 ضد اسپم و فلود</div>
+<div class="switch"><input type="checkbox" name="anti_badword" value="1" {% if selected.anti_badword %}checked{% endif %}> 🤬 ضد فحش فارسی</div>
+<div class="switch"><input type="checkbox" name="captcha_enabled" value="1" {% if selected.captcha_enabled %}checked{% endif %}> 🧩 کپچا بدو ورود</div>
+
+<button class="btn" type="submit">💾 ذخیره تنظیمات</button>
+</form>
+
+{% else %}
+<h3>👈 یه گروه انتخاب کن</h3>
+<p style="color:#aaa;font-size:14px">از لیست سمت راست یه گروه بزن. اگه گروه نمی‌بینی، ربات رو ادمین کن و یه پیام تو گروه بده تا اینجا ثبت شه.</p>
+<div style="background:#0f111a;padding:12px;border-radius:10px;font-size:13px;line-height:1.7;color:#888">
+<b>راهنما:</b><br>
+• پنل روی هاست رایگان هم کار میکنه<br>
+• API Pool رو از همینجا مدیریت کن، نیازی به .env نیست<br>
+• بعد تغییر، نیاز به ریستارت نیست
+</div>
+{% endif %}
+</div>
+</div>
+
+<footer style="text-align:center;padding:18px;color:#666;font-size:12px">
+ساخته شده با ❤️ توسط تیم لونا - نسخه 2.1 | 1403
+</footer>
+</body>
+</html>

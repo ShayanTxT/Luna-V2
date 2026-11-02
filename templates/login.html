@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورود - پنل لونا</title>
+<style>
+*{box-sizing:border-box;font-family:Vazirmatn,Tahoma,sans-serif}
+body{margin:0;background:#0f111a;color:#e8e8e8;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{background:#1a1d2e;border:1px solid #2a2f4a;border-radius:16px;padding:24px;width:90%;max-width:360px;text-align:center}
+input{width:100%;padding:11px;border-radius:9px;border:1px solid #33364a;background:#0f111a;color:#fff;margin:10px 0}
+.btn{background:linear-gradient(135deg,#6a11cb,#2575fc);border:none;color:#fff;padding:11px;width:100%;border-radius:10px;font-weight:700;cursor:pointer}
+.err{background:#3d0a0a;color:#f87171;padding:8px;border-radius:8px;margin-bottom:10px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>🔒 ورود به پنل لونا</h2>
+<p style="color:#888;font-size:13px">رمز پنل را وارد کنید (WEB_SECRET)</p>
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+<form method="post" action="/login">
+<input type="password" name="password" placeholder="رمز..." required autofocus>
+<button class="btn">ورود</button>
+</form>
+<p style="color:#555;font-size:11px;margin-top:12px">پیش‌فرض: luna-secret-123 را عوض کنید</p>
+</div>
+</body>
+</html>

@@ -28,7 +28,7 @@ class Settings:
     BOT_USERNAME: str = os.getenv("BOT_USERNAME", "LunaBot")
     OWNER_ID: int = _env_int("OWNER_ID", 0)
 
-    # Web
+    # Web - WEB_SECRET is mandatory and must be >=32 chars
     PORT: int = _env_int("PORT", 8000)
     WEB_SECRET: str = os.getenv("WEB_SECRET", "")
     WEB_HOST: str = os.getenv("WEB_HOST", "0.0.0.0")
@@ -62,6 +62,11 @@ class Settings:
             errors.append("BOT_TOKEN is required")
         elif len(self.BOT_TOKEN) < 20:
             errors.append("BOT_TOKEN looks invalid")
+        # WEB_SECRET is mandatory for panel security
+        if not self.WEB_SECRET:
+            errors.append("WEB_SECRET is required (min 32 chars) - generate with: openssl rand -hex 32")
+        elif len(self.WEB_SECRET) < 32:
+            errors.append("WEB_SECRET must be at least 32 characters (weak secret rejected)")
         if errors:
             raise ValueError("; ".join(errors))
 

@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ShayanTxT/luna-bot"><img src="https://img.shields.io/github/stars/ShayanTxT/luna-bot?style=social" alt="Stars"></a>
+  <a href="https://github.com/ShayanTxT/Luna-V2"><img src="https://img.shields.io/github/stars/ShayanTxT/Luna-V2?style=social" alt="Stars"></a>
   <img src="https://img.shields.io/badge/python-3.11+-3776ab?style=flat&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Telegram-Bot-26A5E4?style=flat&logo=telegram" alt="Telegram">
   <a href="README.md">🇬🇧 English</a>
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <a href="https://render.com/deploy?repo=https://github.com/ShayanTxT/luna-bot"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy"></a>
+  <a href="https://render.com/deploy?repo=https://github.com/ShayanTxT/Luna-V2"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy"></a>
 </p>
 
 ---
@@ -54,10 +54,11 @@
 
 **۲. اجرا**
 ```bash
-cp .env.example .env  # توکن و کلید را پر کن
+cp .env.example .env  # BOT_TOKEN, GROQ_API_KEY, WEB_SECRET (حداقل ۳۲ کاراکتر) را پر کن
+# ساخت WEB_SECRET: openssl rand -hex 32
 pip install -r requirements.txt
 python bot.py
-# ربات + پنل http://localhost:8000/admin
+# ربات + پنل http://localhost:8000/admin (ورود با WEB_SECRET)
 ```
 
 **۳. به گروه اضافه کن**

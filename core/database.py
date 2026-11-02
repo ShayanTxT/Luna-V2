@@ -91,6 +91,37 @@ class DatabaseManager:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS captcha_state (
+                chat_id INTEGER,
+                user_id INTEGER,
+                correct_answer INTEGER,
+                expire_at TIMESTAMP,
+                PRIMARY KEY (chat_id, user_id)
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS group_knowledge (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chat_id INTEGER,
+                question TEXT,
+                answer TEXT,
+                keywords TEXT,
+                added_by INTEGER,
+                hits INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS ai_cache (
+                hash TEXT PRIMARY KEY,
+                chat_id INTEGER,
+                prompt TEXT,
+                response TEXT,
+                tokens_saved INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         # Migration: add missing columns to old DBs
         try:
             cur = await db.execute("PRAGMA table_info(groups)")
@@ -118,6 +149,23 @@ class DatabaseManager:
         await db.execute("CREATE INDEX IF NOT EXISTS idx_chat_history_chat ON chat_history(chat_id);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_warns_chat_user ON warns(chat_id, user_id);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_users_points ON users(points DESC);")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_captcha_state_expire ON captcha_state(expire_at);")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_group_knowledge_chat ON group_knowledge(chat_id);")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_api_providers_enabled ON api_providers(enabled);")
+        # Migration: ensure captcha_state exists for databases created before v2.5
+        try:
+            await db.execute("SELECT 1 FROM captcha_state LIMIT 1")
+        except Exception:
+            logger.warning("captcha_state missing, recreating via _create_tables")
+            await db.execute("""
+                CREATE TABLE IF NOT EXISTS captcha_state (
+                    chat_id INTEGER,
+                    user_id INTEGER,
+                    correct_answer INTEGER,
+                    expire_at TIMESTAMP,
+                    PRIMARY KEY (chat_id, user_id)
+                )
+            """)
 
     @asynccontextmanager
     async def connection(self):

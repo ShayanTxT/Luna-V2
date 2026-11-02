@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ShayanTxT/luna-bot"><img src="https://img.shields.io/github/stars/ShayanTxT/luna-bot?style=social" alt="Stars"></a>
+  <a href="https://github.com/ShayanTxT/Luna-V2"><img src="https://img.shields.io/github/stars/ShayanTxT/Luna-V2?style=social" alt="Stars"></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-3776ab?style=flat&logo=python&logoColor=white" alt="Python"></a>
   <a href="https://core.telegram.org/bots"><img src="https://img.shields.io/badge/Telegram-Bot-26A5E4?style=flat&logo=telegram" alt="Telegram"></a>
   <img src="https://img.shields.io/badge/aiogram-3.13-blue" alt="aiogram">
@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://render.com/deploy?repo=https://github.com/ShayanTxT/luna-bot"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render"></a>
+  <a href="https://render.com/deploy?repo=https://github.com/ShayanTxT/Luna-V2"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render"></a>
   &nbsp;
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-features">Features</a> •
@@ -60,10 +60,11 @@
 
 **2. Run**
 ```bash
-cp .env.example .env  # fill BOT_TOKEN, GROQ_API_KEY
+cp .env.example .env  # fill BOT_TOKEN, GROQ_API_KEY, WEB_SECRET (min 32 chars)
+# Generate WEB_SECRET: openssl rand -hex 32
 pip install -r requirements.txt
 python bot.py
-# Bot polling + Panel http://localhost:8000/admin
+# Bot polling + Panel http://localhost:8000/admin (login with WEB_SECRET)
 ```
 
 **3. Add to group**

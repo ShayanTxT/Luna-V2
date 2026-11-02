@@ -13,27 +13,4 @@ venv/
 .DS_Store
 luna-v2.zip
 
-# Private files
 shayan.txt
-.env.*
-!.env.example
-secrets/
-*.pem
-*.key
-
-# Python
-.coverage
-htmlcov/
-.mypy_cache/
-
-# Build artifacts
-build/
-dist/
-*.egg-info/
-
-# Databases and backups
-*.sqlite3
-*.db-journal
-
-# Local backups
-*.bak

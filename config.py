@@ -121,5 +121,5 @@ DEFAULT_GROUP_SETTINGS = {
     "games_enabled": 1,
 }
 
-WEB_SECRET = os.getenv("WEB_SECRET", "")
+WEB_SECRET = os.getenv("WEB_SECRET", "luna-secret-123")
 PORT = int(os.getenv("PORT", "8000"))

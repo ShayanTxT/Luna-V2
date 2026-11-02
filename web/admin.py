@@ -7,7 +7,7 @@ from database.db import get_group, get_all_groups, update_group
 from database.db import get_all_api_providers, add_api_provider, update_api_provider, delete_api_provider
 from core.database import db_manager
 from core.config import settings
-from web.auth import get_current_user, create_session, is_valid_session
+from web.auth import get_current_user, create_session, is_valid_session, is_https_request
 import time, html
 
 app = FastAPI(title="Luna Panel")
@@ -22,10 +22,13 @@ async def login_page(request: Request, error: str = None):
 @app.post("/login")
 async def login(request: Request, password: str = Form(...)):
     import hmac
+    # Enforce mandatory and strong secret
+    if not settings.WEB_SECRET or len(settings.WEB_SECRET) < 32:
+        return templates.TemplateResponse("login.html", {"request": request, "error": "WEB_SECRET not configured (min 32 chars)"}, status_code=500)
     if hmac.compare_digest(password, settings.WEB_SECRET):
         token = create_session()
         resp = RedirectResponse("/admin", status_code=303)
-        resp.set_cookie("luna_session", token, httponly=True, max_age=86400)
+        resp.set_cookie("luna_session", token, httponly=True, max_age=86400, secure=is_https_request(request), samesite="lax")
         return resp
     return templates.TemplateResponse("login.html", {"request": request, "error": "رمز اشتباه"}, status_code=401)
 

@@ -4,6 +4,10 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      BOT_TOKEN: "123456789:AAH_dummy_for_ci_testing_only_do_not_use"
+      WEB_SECRET: "ci_test_secret_32_chars_minimum_for_testing_only"
+      GROQ_API_KEY: "gsk_dummy"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -11,8 +15,16 @@ jobs:
           python-version: "3.11"
       - run: pip install -r requirements.txt
       - run: pip install pytest pytest-asyncio
+      - run: |
+          cat > pytest.ini << 'EOF'
+          [pytest]
+          asyncio_mode = auto
+          asyncio_default_fixture_loop_scope = function
+          testpaths = tests
+          EOF
+          cat pytest.ini
       - run: pytest -q
-      - run: python -m py_compile bot.py
+      - run: python -m py_compile bot.py core/database.py web/auth.py
 
   docker:
     runs-on: ubuntu-latest
